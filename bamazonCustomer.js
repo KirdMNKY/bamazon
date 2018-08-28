@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
 connection.connect(function(err){
     if(err) throw err;
     displayItems();
-    runBuy();
+    
 });
 
 function displayItems(){
@@ -24,6 +24,7 @@ function displayItems(){
             );
         }
     });
+    runBuy();
 }
 
 function formatText(text){
@@ -39,13 +40,16 @@ function formatText(text){
 }
 
 function runBuy(){
+
     inquirer.prompt({
         type: "list",
         message: "Would you like to POST or BID: ",
         name: "postBid",
         choices: ["POST", "BID"]
-    }).then(function(err, res){
-        switch(res){
+    }).then(function(res){
+        console.log(res.postBid);
+        var userResp = res.postBid;
+        switch(userResp){
             case "POST":
                 postItem();
             break;
@@ -54,6 +58,7 @@ function runBuy(){
             break;
         }
     });
+    displayItems();
 }
 
 function postItem(){
@@ -98,6 +103,7 @@ function postItem(){
 }
 
 function postBid(){
+    console.log("postBid run");
     inquirer.prompt([
         {
             type: "input",
@@ -105,27 +111,40 @@ function postBid(){
             name: "itemBid"
         }
     ]).then(function(res){
+        console.log(res.itemBid);
         var itemNum = res.itemBid;
         connection.query("SELECT ? FROM products",[itemNum] , function(err, ans){
             if(err) throw err;
-            inquirer.prompt([
-                {
-                type: "input",
-                message: "How much would you like to BID: ",
-                name: "bidAmt"
-                }
-            ]).then(function(res){
-                //check if bidAmt > or < current bid
-                if(res.bidAmt > ans.price)
-                {
-                    connection.query("UPDATE price FROM products WHERE price=" + ans.price, function(err, res){
-                        if(err) throw err;
-                        console.log("You have the high bid now");
-                    });
-                }else{
-                    console.log("Your bid is not high enough.");
-                }
-            });
+            //Function to get amount
+            getBidAmt(itemNum);
         });
     });
+}
+
+function getBidAmt(itemNum){
+    inquirer.prompt([
+        {
+        type: "input",
+        message: "How much would you like to BID: ",
+        name: "bidAmt"
+        }
+    ]).then(function(ans){
+        //check if bidAmt > or < current bid
+        connection.query("SELECT price FROM products WHERE item_id=" + itemNum + ";", function(err, res){
+        if(err) throw err;
+        console.log(ans.bidAmt + " / " + res[0].price);
+        if(parseFloat(ans.bidAmt) > parseFloat(res[0].price))
+        {
+            console.log("You have the high bid on item number " +  itemNum + " .");
+            //change the bid
+            var query = "UPDATE products SET price=? WHERE item_id=" + itemNum;
+            connection.query(query, [parseFloat(ans.bidAmt)], function(err, res){
+                console.log()
+            });
+        }else{
+            console.log("Your bid is not high enough.");
+        }
+    });
+})
+displayItems();
 }
