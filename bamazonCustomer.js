@@ -54,11 +54,11 @@ function runBuy(){
                 postItem();
             break;
             case "BID":
-                postBid();
+                postBid();   
             break;
         }
     });
-    displayItems();
+    
 }
 
 function postItem(){
@@ -118,6 +118,7 @@ function postBid(){
             //Function to get amount
             getBidAmt(itemNum);
         });
+
     });
 }
 
@@ -140,11 +141,13 @@ function getBidAmt(itemNum){
             var query = "UPDATE products SET price=? WHERE item_id=" + itemNum;
             connection.query(query, [parseFloat(ans.bidAmt)], function(err, res){
                 console.log()
+                displayItems();
             });
         }else{
             console.log("Your bid is not high enough.");
+            displayItems();
         }
     });
 })
-displayItems();
+ 
 }
