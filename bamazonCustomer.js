@@ -93,10 +93,11 @@ function postItem(){
         var itemAmt = res.itemAmt;
 
         //query
-        connection.query("INSERT INTO products (product_name, department_name, price, stock_quantity VALUES (?, ?, ?, ?",[itemName, itemCat, itemPrice, itemAmt], function(err, res){
+        connection.query("INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES (?, ?, ?, ?)",[itemName, itemCat, parseFloat(itemPrice), parseInt(itemAmt)], function(err, res){
             if(err) throw err;
             //show item info and full list
             console.log("Your item has been added as " + itemName + ".");
+            displayItems();
         });
 
     });
