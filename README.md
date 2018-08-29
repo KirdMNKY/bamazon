@@ -16,4 +16,5 @@ You may then select whether to BID on an Item or POST and item for bidding.
   Enter how many you would like to sell
   Item is posted
   
+  ## See the application in action:
   https://drive.google.com/file/d/1Y-l9u6fBnzQXPuAuZByleXnXEyS60zOY/view
